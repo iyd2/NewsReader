@@ -2,6 +2,7 @@ package iyd2.projects.newsviewer;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import android.support.v4.app.Fragment;
@@ -35,6 +36,33 @@ public class NewsRecyclerFragment extends Fragment {
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return v;
+    }
+
+
+    private static class NewsHolder extends RecyclerView.ViewHolder {
+
+        public NewsHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+    private static class NewsAdapter extends RecyclerView.Adapter<NewsHolder> {
+
+        @NonNull
+        @Override
+        public NewsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return null;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull NewsHolder holder, int position) {
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return 0;
+        }
     }
 
 
