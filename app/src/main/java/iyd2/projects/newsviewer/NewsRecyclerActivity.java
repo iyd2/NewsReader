@@ -8,7 +8,7 @@ public class NewsRecyclerActivity extends SingleActivityFragment {
 
     @Override
     public Fragment createFragment() {
-        return null;
+        return NewsRecyclerFragment.newInstance();
     }
 
 }
