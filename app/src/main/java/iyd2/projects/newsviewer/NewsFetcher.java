@@ -3,6 +3,10 @@ package iyd2.projects.newsviewer;
 import android.net.Uri;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,20 +25,49 @@ public class NewsFetcher {
     private static final String ENDPOINT_EVERYTHING = "everything";
     private static final String ENDPOINT_SOURCES = "sources";
 
-    public List<NewsItem> fetchNewsItems() throws IOException {
+    public List<NewsItem> fetchNewsItems() {
         List<NewsItem> items = new ArrayList<>();
 
-        String urlSpec = Uri.parse(ENDPOINT_BASE + ENDPOINT_TOP)
-                .buildUpon()
-                .appendQueryParameter("country", "ru")
-                .appendQueryParameter("apiKey", API_KEY)
-                .build()
-                .toString();
+        try {
+            String urlSpec = Uri.parse(ENDPOINT_BASE + ENDPOINT_TOP)
+                    .buildUpon()
+                    .appendQueryParameter("country", "ru")
+                    .appendQueryParameter("apiKey", API_KEY)
+                    .build()
+                    .toString();
 
-        String jsonResponse = getUrlString(urlSpec);
-        Log.i(TAG, jsonResponse);
+            JSONObject jsonResponse = new JSONObject(getUrlString(urlSpec));
+            parseItems(items, jsonResponse);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return items;
+    }
+
+    public void parseItems(List<NewsItem> items, JSONObject jsonObject) {
+        try {
+            JSONArray jsonArticles = jsonObject.getJSONArray("articles");
+
+            for (int i = 0; i < jsonArticles.length(); i++) {
+                JSONObject jsonItem =  jsonArticles.getJSONObject(i);
+
+                NewsItem item = new NewsItem(jsonItem.getString("title"),
+                        jsonItem.getString("description"));
+
+                if (!jsonItem.has("urlToImage")) {
+                    continue;
+                }
+
+                item.setUrlToImage(jsonItem.getString("urlToImage"));
+                items.add(item);
+            }
+
+        } catch (JSONException je) {
+            Log.e(TAG, "Failed to parse JSON", je);
+        }
     }
 
     public String getUrlString (String urlSpec) throws IOException {
