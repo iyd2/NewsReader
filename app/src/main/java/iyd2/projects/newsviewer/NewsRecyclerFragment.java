@@ -1,8 +1,12 @@
 package iyd2.projects.newsviewer;
 
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -12,9 +16,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +27,7 @@ public class NewsRecyclerFragment extends Fragment {
     private static final String TAG = "NewsRecyclerFragment";
 
     private RecyclerView mRecyclerView;
+    private ImageDownloader<NewsHolder> mImageDownloader;
     private List<NewsItem> mNewsItems = new ArrayList<>();
 
     public static Fragment newInstance() {
@@ -36,6 +41,19 @@ public class NewsRecyclerFragment extends Fragment {
         setRetainInstance(true);
 
         new FetchNewsItems().execute();
+
+        Handler responseHandler = new Handler();
+        mImageDownloader = new ImageDownloader<>(responseHandler);
+        mImageDownloader.setImageDownloadListener(new ImageDownloader.ImageDownloadListener<NewsHolder>() {
+            @Override
+            public void onImageDownloaded(NewsHolder holder, Bitmap bitmap) {
+                Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+                holder.onBindViewDrawable(drawable);
+            }
+        });
+        mImageDownloader.start();
+        mImageDownloader.getLooper();
+
     }
 
     @Nullable
@@ -52,6 +70,18 @@ public class NewsRecyclerFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         setupAdapter();
         return v;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mImageDownloader.clearQueue();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mImageDownloader.quit();
     }
 
     private class FetchNewsItems extends AsyncTask<Void, Void, List<NewsItem>> {
@@ -78,24 +108,30 @@ public class NewsRecyclerFragment extends Fragment {
     }
 
 
-    private static class NewsHolder extends RecyclerView.ViewHolder {
+    private class NewsHolder extends RecyclerView.ViewHolder {
 
         private TextView mItemTitle;
+        private ImageView mItemImage;
         private NewsItem mNewsItem;
 
         public NewsHolder(View itemView) {
             super(itemView);
 
             mItemTitle = itemView.findViewById(R.id.news_item_title);
+            mItemImage = itemView.findViewById(R.id.news_item_image);
         }
 
         public void onBindNewsItem(NewsItem item) {
             mNewsItem = item;
             mItemTitle.setText(mNewsItem.getTitle());
         }
+
+        public void onBindViewDrawable(Drawable drawable) {
+            mItemImage.setImageDrawable(drawable);
+        }
     }
 
-    private static class NewsAdapter extends RecyclerView.Adapter<NewsHolder> {
+    private class NewsAdapter extends RecyclerView.Adapter<NewsHolder> {
 
         private List<NewsItem> mNewsItems;
 
@@ -112,7 +148,9 @@ public class NewsRecyclerFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull NewsHolder holder, int position) {
-            holder.onBindNewsItem(mNewsItems.get(position));
+            NewsItem item = mNewsItems.get(position);
+            holder.onBindNewsItem(item);
+            mImageDownloader.queueImage(holder, item.getUrlToImage());
         }
 
         @Override
