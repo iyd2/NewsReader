@@ -11,11 +11,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,6 +29,7 @@ public class NewsRecyclerFragment extends Fragment {
 
     private static final String TAG = "NewsRecyclerFragment";
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private ImageDownloader<NewsHolder> mImageDownloader;
     private List<NewsItem> mNewsItems = new ArrayList<>();
@@ -61,6 +65,14 @@ public class NewsRecyclerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.news_recycler, container, false);
 
+        mSwipeRefreshLayout = v.findViewById(R.id.recycler_container);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new FetchNewsItems().execute();
+
+            }
+        });
         mRecyclerView = v.findViewById(R.id.recycler_view);
 
         // use this setting to improve performance if you know that changes
@@ -103,7 +115,11 @@ public class NewsRecyclerFragment extends Fragment {
     // Вызывается при создании нового объекта RecyclerView.
     public void setupAdapter() {
         if (isAdded()) {
-            mRecyclerView.setAdapter(new NewsAdapter(mNewsItems));
+            Log.i(TAG, "Fragment has been added");
+            NewsAdapter adapter = new NewsAdapter(mNewsItems);
+            mRecyclerView.setAdapter(adapter);
+            adapter.update();
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -157,7 +173,13 @@ public class NewsRecyclerFragment extends Fragment {
         public int getItemCount() {
             return mNewsItems.size();
         }
+
+        public void update() {
+            notifyDataSetChanged();
+        }
+
     }
+
 
 
 }
