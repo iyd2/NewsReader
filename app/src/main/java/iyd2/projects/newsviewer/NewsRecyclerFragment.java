@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -143,9 +144,13 @@ public class NewsRecyclerFragment extends Fragment {
 
     public void addNewsItems(List<NewsItem> items) {
         Log.i(TAG, "addNewsItems");
-        mNewsItems.addAll(0, items);
-        NewsAdapter adapter = (NewsAdapter) mRecyclerView.getAdapter();
-        adapter.notifyItemRangeInserted(0, items.size() - 1);
+        if (items.size() != 0) {
+            mNewsItems.addAll(0, items);
+            NewsAdapter adapter = (NewsAdapter) mRecyclerView.getAdapter();
+            //adapter.notifyDataSetChanged();
+            adapter.notifyItemRangeInserted(0, items.size());
+            mRecyclerView.scrollToPosition(0);
+        }
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

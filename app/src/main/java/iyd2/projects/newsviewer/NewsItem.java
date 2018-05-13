@@ -1,5 +1,7 @@
 package iyd2.projects.newsviewer;
 
+import java.util.Date;
+
 public class NewsItem {
 
     private String author;
@@ -7,7 +9,7 @@ public class NewsItem {
     private String description;
     private String url;
     private String urlToImage;
-    private String publishedAt;
+    private Date publishedAt;
 
     public NewsItem(String title, String description) {
         this.title = title;
@@ -36,5 +38,13 @@ public class NewsItem {
 
     public void setUrlToImage(String urlToImage) {
         this.urlToImage = urlToImage;
+    }
+
+    public Date getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(Date publishedAt) {
+        this.publishedAt = publishedAt;
     }
 }

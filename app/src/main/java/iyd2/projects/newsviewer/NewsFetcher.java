@@ -12,7 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class NewsFetcher {
@@ -25,19 +28,28 @@ public class NewsFetcher {
     private static final String ENDPOINT_EVERYTHING = "everything";
     private static final String ENDPOINT_SOURCES = "sources";
 
-    public List<NewsItem> fetchNewsItems() {
-        List<NewsItem> items = new ArrayList<>();
+
+    public List<NewsItem> fetchNewsItems(Date lastDate) {
+        List<NewsItem> items = new LinkedList<>();
 
         try {
             String urlSpec = Uri.parse(ENDPOINT_BASE + ENDPOINT_TOP)
                     .buildUpon()
                     .appendQueryParameter("country", "ru")
+                    .appendQueryParameter("source", "ria.ru")
                     .appendQueryParameter("apiKey", API_KEY)
                     .build()
                     .toString();
 
+            Log.i(TAG, urlSpec);
             JSONObject jsonResponse = new JSONObject(getUrlString(urlSpec));
-            parseItems(items, jsonResponse);
+
+            if (lastDate == null) {
+                parseItems(items, jsonResponse);
+            } else {
+                parseRecentItems(items, jsonResponse, lastDate);
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -48,8 +60,10 @@ public class NewsFetcher {
     }
 
     public void parseItems(List<NewsItem> items, JSONObject jsonObject) {
+
         try {
             JSONArray jsonArticles = jsonObject.getJSONArray("articles");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss");
 
             for (int i = 0; i < jsonArticles.length(); i++) {
                 JSONObject jsonItem =  jsonArticles.getJSONObject(i);
@@ -57,18 +71,58 @@ public class NewsFetcher {
                 NewsItem item = new NewsItem(jsonItem.getString("title"),
                         jsonItem.getString("description"));
 
-                if (!jsonItem.has("urlToImage")) {
-                    continue;
+                //if (jsonItem.has("publishedAt")) {
+                item.setPublishedAt(dateFormat.parse(jsonItem.getString("publishedAt")));
+                //}
+
+                if (jsonItem.has("urlToImage")) {
+                    item.setUrlToImage(jsonItem.getString("urlToImage"));
                 }
 
-                item.setUrlToImage(jsonItem.getString("urlToImage"));
                 items.add(item);
             }
 
         } catch (JSONException je) {
             Log.e(TAG, "Failed to parse JSON", je);
+        } catch (ParseException pe) {
+            Log.e(TAG, "Failed to parse Date", pe);
         }
     }
+
+    public void parseRecentItems(List<NewsItem> items, JSONObject jsonObject, Date lastDate) {
+
+        try {
+            JSONArray jsonArticles = jsonObject.optJSONArray("articles");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss");
+
+            for (int i = 0; i < jsonArticles.length(); i++) {
+                JSONObject jsonItem = jsonArticles.optJSONObject(i);
+
+                Date publishedAt = dateFormat.parse(jsonItem.getString("publishedAt"));
+
+                if (publishedAt.compareTo(lastDate) <= 0) {
+                    break;
+                }
+
+                NewsItem item = new NewsItem(jsonItem.getString("title"),
+                        jsonItem.getString("description"));
+
+                if (jsonItem.has("urlToImage")) {
+                    item.setUrlToImage(jsonItem.getString("urlToImage"));
+                }
+
+                item.setPublishedAt(publishedAt);
+
+                items.add(item);
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public String getUrlString (String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));
@@ -98,5 +152,7 @@ public class NewsFetcher {
             urlConnection.disconnect();
         }
     }
+
+
 
 }
