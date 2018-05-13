@@ -1,7 +1,7 @@
 package iyd2.projects.newsviewer;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -18,6 +18,7 @@ public class ImageDownloader<T> extends HandlerThread {
     private Handler mResponseHandler;
     private ImageDownloadListener<T> mImageDownloadListener;
     private ConcurrentHashMap<T, String> mHashMap = new ConcurrentHashMap<>();
+    private Point mReqSize;
 
     public interface ImageDownloadListener<T> {
         void onImageDownloaded(T holder, Bitmap bitmap);
@@ -27,9 +28,10 @@ public class ImageDownloader<T> extends HandlerThread {
         mImageDownloadListener = listener;
     }
 
-    public ImageDownloader(Handler responseHandler) {
+    public ImageDownloader(Point reqSize, Handler responseHandler) {
         super(TAG);
         mResponseHandler = responseHandler;
+        mReqSize = reqSize;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class ImageDownloader<T> extends HandlerThread {
 
         try {
             byte[] imageBytes = new NewsFetcher().getUrlBytes(url);
-            final Bitmap imageBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            final Bitmap imageBitmap = BitmapUtil.decodeByteArray(imageBytes, mReqSize.x);
 
             mResponseHandler.post(new Runnable() {
                 @Override

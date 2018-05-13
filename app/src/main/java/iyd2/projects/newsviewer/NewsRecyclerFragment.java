@@ -18,11 +18,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
+
+
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class NewsRecyclerFragment extends Fragment {
@@ -32,7 +34,7 @@ public class NewsRecyclerFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private ImageDownloader<NewsHolder> mImageDownloader;
-    private List<NewsItem> mNewsItems = new ArrayList<>();
+    private List<NewsItem> mNewsItems = new LinkedList<>();
 
     public static Fragment newInstance() {
         return new NewsRecyclerFragment();
@@ -42,12 +44,14 @@ public class NewsRecyclerFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.i(TAG, "onCreate");
+
         setRetainInstance(true);
 
-        new FetchNewsItems().execute();
+        new FetchNewsItems().execute((Date) null);
 
         Handler responseHandler = new Handler();
-        mImageDownloader = new ImageDownloader<>(responseHandler);
+        mImageDownloader = new ImageDownloader<>(BitmapUtil.getActivitySize(getActivity()), responseHandler);
         mImageDownloader.setImageDownloadListener(new ImageDownloader.ImageDownloadListener<NewsHolder>() {
             @Override
             public void onImageDownloaded(NewsHolder holder, Bitmap bitmap) {
@@ -63,13 +67,16 @@ public class NewsRecyclerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
+        Log.i(TAG, "onCreateView");
+
         View v = inflater.inflate(R.layout.news_recycler, container, false);
 
         mSwipeRefreshLayout = v.findViewById(R.id.recycler_container);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new FetchNewsItems().execute();
+                new FetchNewsItems().execute(mNewsItems.get(0).getPublishedAt());
 
             }
         });
@@ -77,7 +84,7 @@ public class NewsRecyclerFragment extends Fragment {
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
+        // mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         setupAdapter();
@@ -87,47 +94,66 @@ public class NewsRecyclerFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        Log.i(TAG, "onDestroyView");
+
         mImageDownloader.clearQueue();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        Log.i(TAG, "onDestroy");
+
         mImageDownloader.quit();
     }
 
-    private class FetchNewsItems extends AsyncTask<Void, Void, List<NewsItem>> {
+    private class FetchNewsItems extends AsyncTask<Date, Void, List<NewsItem>> {
 
         @Override
-        protected List<NewsItem> doInBackground(Void... voids) {
-            return new NewsFetcher().fetchNewsItems();
-
+        protected List<NewsItem> doInBackground(Date... dates) {
+           // if (booleans[0] == true) {
+                return new NewsFetcher().fetchNewsItems(dates[0]);
+            //}
         }
 
         // Выполняется в главном потоке.
         @Override
         protected void onPostExecute(List<NewsItem> items) {
-            mNewsItems = items;
-            setupAdapter();
+
+            if (mNewsItems.isEmpty()) {
+                mNewsItems = items;
+                setupAdapter();
+            } else {
+                addNewsItems(items);
+            }
+
         }
     }
 
     // Вызывается при создании нового объекта RecyclerView.
     public void setupAdapter() {
         if (isAdded()) {
-            Log.i(TAG, "Fragment has been added");
-            NewsAdapter adapter = new NewsAdapter(mNewsItems);
-            mRecyclerView.setAdapter(adapter);
-            adapter.update();
-            mSwipeRefreshLayout.setRefreshing(false);
+            Log.i(TAG, "setupAdapter");
+            mRecyclerView.setAdapter(new NewsAdapter(mNewsItems));
+
         }
     }
 
+    public void addNewsItems(List<NewsItem> items) {
+        Log.i(TAG, "addNewsItems");
+        mNewsItems.addAll(0, items);
+        NewsAdapter adapter = (NewsAdapter) mRecyclerView.getAdapter();
+        adapter.notifyItemRangeInserted(0, items.size() - 1);
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
 
     private class NewsHolder extends RecyclerView.ViewHolder {
 
         private TextView mItemTitle;
         private ImageView mItemImage;
+        private TextView mIemPublishedAt;
         private NewsItem mNewsItem;
 
         public NewsHolder(View itemView) {
@@ -135,15 +161,24 @@ public class NewsRecyclerFragment extends Fragment {
 
             mItemTitle = itemView.findViewById(R.id.news_item_title);
             mItemImage = itemView.findViewById(R.id.news_item_image);
+            mIemPublishedAt = itemView.findViewById(R.id.news_item_published_at);
         }
 
         public void onBindNewsItem(NewsItem item) {
             mNewsItem = item;
             mItemTitle.setText(mNewsItem.getTitle());
+            String publishedAt = mNewsItem.getPublishedAt().toString();
+            if (publishedAt != null) {
+                mIemPublishedAt.setText(publishedAt);
+            }
         }
 
         public void onBindViewDrawable(Drawable drawable) {
             mItemImage.setImageDrawable(drawable);
+        }
+
+        public int getImageWidth() {
+            return mItemImage.getWidth();
         }
     }
 
@@ -158,7 +193,9 @@ public class NewsRecyclerFragment extends Fragment {
         @NonNull
         @Override
         public NewsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_item, parent, false);
+
             return new NewsHolder(itemView);
         }
 
@@ -166,7 +203,11 @@ public class NewsRecyclerFragment extends Fragment {
         public void onBindViewHolder(@NonNull NewsHolder holder, int position) {
             NewsItem item = mNewsItems.get(position);
             holder.onBindNewsItem(item);
-            mImageDownloader.queueImage(holder, item.getUrlToImage());
+
+            String imageUrl = item.getUrlToImage();
+            if (imageUrl != null) {
+                mImageDownloader.queueImage(holder, imageUrl);
+            }
         }
 
         @Override
@@ -174,12 +215,7 @@ public class NewsRecyclerFragment extends Fragment {
             return mNewsItems.size();
         }
 
-        public void update() {
-            notifyDataSetChanged();
-        }
-
     }
-
 
 
 }
