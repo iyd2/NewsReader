@@ -14,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -154,7 +153,7 @@ public class NewsRecyclerFragment extends Fragment {
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
-    private class NewsHolder extends RecyclerView.ViewHolder {
+    private class NewsHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private TextView mItemTitle;
         private ImageView mItemImage;
@@ -163,6 +162,8 @@ public class NewsRecyclerFragment extends Fragment {
 
         public NewsHolder(View itemView) {
             super(itemView);
+
+            itemView.setOnClickListener(this);
 
             mItemTitle = itemView.findViewById(R.id.news_item_title);
             mItemImage = itemView.findViewById(R.id.news_item_image);
@@ -185,6 +186,11 @@ public class NewsRecyclerFragment extends Fragment {
         public int getImageWidth() {
             return mItemImage.getWidth();
         }
+
+        @Override
+        public void onClick(View v) {
+            startActivity(NewsItemActivity.newIntent(getActivity(), mNewsItem.getUrl()));
+        }
     }
 
     private class NewsAdapter extends RecyclerView.Adapter<NewsHolder> {
@@ -199,7 +205,7 @@ public class NewsRecyclerFragment extends Fragment {
         @Override
         public NewsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_item, parent, false);
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_news_item, parent, false);
 
             return new NewsHolder(itemView);
         }

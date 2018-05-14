@@ -79,6 +79,8 @@ public class NewsFetcher {
                     item.setUrlToImage(jsonItem.getString("urlToImage"));
                 }
 
+                item.setUrl(jsonItem.getString("url"));
+
                 items.add(item);
             }
 
@@ -110,6 +112,8 @@ public class NewsFetcher {
                 if (jsonItem.has("urlToImage")) {
                     item.setUrlToImage(jsonItem.getString("urlToImage"));
                 }
+
+                item.setUrl(jsonItem.getString("url"));
 
                 item.setPublishedAt(publishedAt);
 
