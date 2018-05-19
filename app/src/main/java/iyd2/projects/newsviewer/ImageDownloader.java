@@ -56,7 +56,7 @@ public class ImageDownloader<T> extends HandlerThread {
 
         try {
             byte[] imageBytes = new NewsFetcher().getUrlBytes(url);
-            final Bitmap imageBitmap = BitmapUtil.decodeByteArray(imageBytes, mReqSize.x);
+            final Bitmap imageBitmap = BitmapUtil.decodeByteArray(imageBytes, mReqSize.x, mReqSize.y);
 
             mResponseHandler.post(new Runnable() {
                 @Override

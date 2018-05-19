@@ -1,6 +1,7 @@
 package iyd2.projects.newsviewer;
 
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -27,6 +28,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import static iyd2.projects.newsviewer.BitmapUtil.getImageSize;
+
 public class NewsRecyclerFragment extends Fragment {
 
     private static final String TAG = "NewsRecyclerFragment";
@@ -51,7 +54,8 @@ public class NewsRecyclerFragment extends Fragment {
         new FetchNewsItems().execute((Date) null);
 
         Handler responseHandler = new Handler();
-        mImageDownloader = new ImageDownloader<>(BitmapUtil.getActivitySize(getActivity()), responseHandler);
+
+        mImageDownloader = new ImageDownloader<>(getImageSize(getActivity()), responseHandler);
         mImageDownloader.setImageDownloadListener(new ImageDownloader.ImageDownloadListener<NewsHolder>() {
             @Override
             public void onImageDownloaded(NewsHolder holder, Bitmap bitmap) {
@@ -227,6 +231,5 @@ public class NewsRecyclerFragment extends Fragment {
         }
 
     }
-
 
 }
