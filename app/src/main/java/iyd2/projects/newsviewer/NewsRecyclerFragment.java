@@ -1,7 +1,6 @@
 package iyd2.projects.newsviewer;
 
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -81,14 +80,15 @@ public class NewsRecyclerFragment extends Fragment {
             @Override
             public void onRefresh() {
                 new FetchNewsItems().execute(mNewsItems.get(0).getPublishedAt());
-
             }
         });
         mRecyclerView = v.findViewById(R.id.recycler_view);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
-        // mRecyclerView.setHasFixedSize(true);
+        // Предотвращает вызовы элеменов дерева представлений в recyclerview
+        // (не перерисовывает все элементы views/layouts).
+        mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         setupAdapter();
@@ -187,8 +187,8 @@ public class NewsRecyclerFragment extends Fragment {
             mItemImage.setImageDrawable(drawable);
         }
 
-        public int getImageWidth() {
-            return mItemImage.getWidth();
+        public void clearImageView() {
+            mItemImage.setImageDrawable(null);
         }
 
         @Override
@@ -218,6 +218,7 @@ public class NewsRecyclerFragment extends Fragment {
         public void onBindViewHolder(@NonNull NewsHolder holder, int position) {
             NewsItem item = mNewsItems.get(position);
             holder.onBindNewsItem(item);
+            holder.clearImageView();
 
             String imageUrl = item.getUrlToImage();
             if (imageUrl != null) {

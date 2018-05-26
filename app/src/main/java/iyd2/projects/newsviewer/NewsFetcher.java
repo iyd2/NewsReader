@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -76,7 +77,8 @@ public class NewsFetcher {
                 //}
 
                 if (jsonItem.has("urlToImage")) {
-                    item.setUrlToImage(jsonItem.getString("urlToImage"));
+                    String urlToImage = jsonItem.getString("urlToImage");
+                    item.setUrlToImage(isUrlValid(urlToImage) ? urlToImage : null);
                 }
 
                 item.setUrl(jsonItem.getString("url"));
@@ -110,7 +112,8 @@ public class NewsFetcher {
                         jsonItem.getString("description"));
 
                 if (jsonItem.has("urlToImage")) {
-                    item.setUrlToImage(jsonItem.getString("urlToImage"));
+                    String urlToImage = jsonItem.getString("urlToImage");
+                    item.setUrlToImage(isUrlValid(urlToImage) ? urlToImage : null);
                 }
 
                 item.setUrl(jsonItem.getString("url"));
@@ -154,6 +157,16 @@ public class NewsFetcher {
 
         } finally {
             urlConnection.disconnect();
+        }
+    }
+
+    private boolean isUrlValid(String urlSpec) {
+
+        try {
+            URL url = new URL(urlSpec);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
         }
     }
 

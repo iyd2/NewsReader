@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
@@ -43,20 +44,36 @@ public class BitmapUtil {
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
 
-        Bitmap bmOverlay = Bitmap.createBitmap(reqWidth, reqHeight, Bitmap.Config.ARGB_8888);
-
         options.inJustDecodeBounds = false;
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-        Bitmap bitmap2 = Bitmap.createScaledBitmap(bitmap, reqWidth, reqHeight, false);
+        Bitmap temp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
 
-        return bitmap2;
+        float scaleCoeff;
+        if (reqWidth >= options.outWidth  && reqHeight >= options.outHeight) {
+            scaleCoeff = Math.max(reqWidth / (float) options.outWidth, reqHeight / (float) options.outHeight);
+        } else if (reqWidth <= options.outWidth  && reqHeight <= options.outHeight) {
+            scaleCoeff = Math.max(reqWidth / (float) options.outWidth, reqHeight / (float) options.outHeight);
+        } else if (reqWidth < options.outWidth) {
+            scaleCoeff = reqHeight / (float) options.outHeight;
+        } else {
+            scaleCoeff = reqWidth / (float) options.outWidth;
+        }
 
-    }
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleCoeff, scaleCoeff);
 
 
-    public static int dipToPixels(Context context, float dipValue) {
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
+
+        Bitmap bitmap1 = Bitmap.createBitmap(temp, 0, 0, options.outWidth, options.outHeight, matrix, true);
+        int cropedX = Math.abs(bitmap1.getWidth() - reqWidth) / 2 ;
+        int cropedY = Math.abs(bitmap1.getHeight() - reqHeight) / 2 ;
+        Bitmap bitmap = Bitmap.createBitmap(bitmap1
+                , cropedX
+                , cropedY
+                , reqWidth
+                , reqHeight);
+
+        return bitmap;
+
     }
 
     public static Point getImageSize(Activity activity) {
@@ -69,19 +86,6 @@ public class BitmapUtil {
 
         points.y = (int) activity.getResources().getDimension(R.dimen.bitmapHeight);
         return points;
-    }
-
-    private static Bitmap cropBitmap1(int reqWidth, int reqHeight, Bitmap bitmap) {
-        Bitmap bmOverlay = Bitmap.createBitmap(reqWidth, reqHeight, Bitmap.Config.ARGB_8888);
-
-        Paint paint = new Paint();
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-
-        Canvas canvas = new Canvas(bmOverlay);
-        canvas.drawBitmap(bitmap, 0, 0, null);
-        canvas.drawRect(30, 30, 100, 100, paint);
-
-        return bmOverlay;
     }
 
 
