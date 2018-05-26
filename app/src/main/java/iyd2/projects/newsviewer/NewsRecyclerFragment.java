@@ -4,6 +4,7 @@ package iyd2.projects.newsviewer;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -163,6 +164,7 @@ public class NewsRecyclerFragment extends Fragment {
         private ImageView mItemImage;
         private TextView mIemPublishedAt;
         private NewsItem mNewsItem;
+        private TransitionDrawable mTransitionDrawable;
 
         public NewsHolder(View itemView) {
             super(itemView);
@@ -184,7 +186,11 @@ public class NewsRecyclerFragment extends Fragment {
         }
 
         public void onBindViewDrawable(Drawable drawable) {
-            mItemImage.setImageDrawable(drawable);
+            Drawable background = getResources().getDrawable(R.drawable.image_background);
+            mTransitionDrawable = new TransitionDrawable(new Drawable[]{background, drawable});
+
+            mItemImage.setImageDrawable(mTransitionDrawable);
+            mTransitionDrawable.startTransition(300);
         }
 
         public void clearImageView() {
