@@ -59,30 +59,35 @@ public class BitmapUtil {
         }
 
         Matrix matrix = new Matrix();
-        matrix.postScale(scaleCoeff, scaleCoeff);
+        matrix.setScale(scaleCoeff, scaleCoeff);
 
 
 
-        Bitmap bitmap1 = Bitmap.createBitmap(temp, 0, 0, options.outWidth, options.outHeight, matrix, true);
-        int cropedX = Math.abs(bitmap1.getWidth() - reqWidth) / 2 ;
+        //Bitmap bitmap1 = Bitmap.createBitmap(temp, 0, 0, options.outWidth, options.outHeight, matrix, true);
+        /*int cropedX = Math.abs(bitmap1.getWidth() - reqWidth) / 2 ;
         int cropedY = Math.abs(bitmap1.getHeight() - reqHeight) / 2 ;
         Bitmap bitmap = Bitmap.createBitmap(bitmap1
                 , cropedX
                 , cropedY
                 , reqWidth
-                , reqHeight);
+                , reqHeight);*/
 
-        return bitmap;
+        return Bitmap.createBitmap(temp, 0, 0, options.outWidth, options.outHeight, matrix, true);
 
     }
 
     public static Point getImageSize(Activity activity) {
         Point points = new Point();
+
+        int padding = (int) activity.getResources().getDimension(R.dimen.sidePadding);
+
         activity.getWindowManager().getDefaultDisplay().getSize(points);
 
         if (points.x > points.y) {
             points.x = points.y;
         }
+
+        points.x -= padding * 2;
 
         points.y = (int) activity.getResources().getDimension(R.dimen.bitmapHeight);
         return points;

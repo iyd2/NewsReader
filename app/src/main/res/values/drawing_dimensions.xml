@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="bitmapHeight">200dp</dimen>
+    <dimen name="sidePadding">12dp</dimen>
 </resources>
