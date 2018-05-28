@@ -164,7 +164,7 @@ public class NewsRecyclerFragment extends Fragment {
         private ImageView mItemImage;
         private TextView mIemPublishedAt;
         private NewsItem mNewsItem;
-        private TransitionDrawable mTransitionDrawable;
+        private Drawable mImageBackground;
 
         public NewsHolder(View itemView) {
             super(itemView);
@@ -174,6 +174,7 @@ public class NewsRecyclerFragment extends Fragment {
             mItemTitle = itemView.findViewById(R.id.news_item_title);
             mItemImage = itemView.findViewById(R.id.news_item_image);
             mIemPublishedAt = itemView.findViewById(R.id.news_item_published_at);
+            mImageBackground = getResources().getDrawable(R.drawable.image_background);
         }
 
         public void onBindNewsItem(NewsItem item) {
@@ -186,15 +187,13 @@ public class NewsRecyclerFragment extends Fragment {
         }
 
         public void onBindViewDrawable(Drawable drawable) {
-            Drawable background = getResources().getDrawable(R.drawable.image_background);
-            mTransitionDrawable = new TransitionDrawable(new Drawable[]{background, drawable});
-
+            TransitionDrawable mTransitionDrawable = new TransitionDrawable(new Drawable[]{mImageBackground, drawable});
             mItemImage.setImageDrawable(mTransitionDrawable);
             mTransitionDrawable.startTransition(300);
         }
 
-        public void clearImageView() {
-            mItemImage.setImageDrawable(null);
+        public void setImageBackground() {
+            mItemImage.setImageDrawable(mImageBackground);
         }
 
         @Override
@@ -211,11 +210,27 @@ public class NewsRecyclerFragment extends Fragment {
             mNewsItems = items;
         }
 
+        @Override
+        public int getItemViewType(int position) {
+            if (mNewsItems.get(position).getUrlToImage() != null) {
+                return R.layout.recycler_imaged_news_item;
+            } else {
+                return R.layout.recycler_news_item;
+            }
+        }
+
         @NonNull
         @Override
         public NewsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_news_item, parent, false);
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_imaged_news_item, parent, false);;
+            switch (viewType) {
+                case R.layout.recycler_imaged_news_item:
+                    break;
+                case R.layout.recycler_news_item:
+                    itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_imaged_news_item, parent, false);
+                    break;
+            }
 
             return new NewsHolder(itemView);
         }
@@ -224,10 +239,10 @@ public class NewsRecyclerFragment extends Fragment {
         public void onBindViewHolder(@NonNull NewsHolder holder, int position) {
             NewsItem item = mNewsItems.get(position);
             holder.onBindNewsItem(item);
-            holder.clearImageView();
 
             String imageUrl = item.getUrlToImage();
             if (imageUrl != null) {
+                holder.setImageBackground();
                 mImageDownloader.queueImage(holder, imageUrl);
             }
         }
