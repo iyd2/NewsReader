@@ -1,6 +1,7 @@
 package iyd2.projects.newsviewer;
 
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -51,7 +52,9 @@ public class NewsRecyclerFragment extends Fragment {
 
         setRetainInstance(true);
 
-        new FetchNewsItems().execute((Date) null);
+        new FetchNewsItems(null).execute();
+
+        PollService.setServiceAlarm(getActivity(), true);
 
         Handler responseHandler = new Handler();
 
@@ -80,7 +83,7 @@ public class NewsRecyclerFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new FetchNewsItems().execute(mNewsItems.get(0).getPublishedAt());
+                new FetchNewsItems(getLastDate()).execute();
             }
         });
         mRecyclerView = v.findViewById(R.id.recycler_view);
@@ -114,13 +117,17 @@ public class NewsRecyclerFragment extends Fragment {
         mImageDownloader.quit();
     }
 
-    private class FetchNewsItems extends AsyncTask<Date, Void, List<NewsItem>> {
+    private class FetchNewsItems extends AsyncTask<Void, Void, List<NewsItem>> {
+
+        private Date lastDate;
+
+        public FetchNewsItems(Date lastDate) {
+            this.lastDate = lastDate;
+        }
 
         @Override
-        protected List<NewsItem> doInBackground(Date... dates) {
-           // if (booleans[0] == true) {
-                return new NewsFetcher().fetchNewsItems(dates[0]);
-            //}
+        protected List<NewsItem> doInBackground(Void... voids) {
+            return new NewsFetcher().fetchNewsItems(lastDate);
         }
 
         // Выполняется в главном потоке.
@@ -142,13 +149,13 @@ public class NewsRecyclerFragment extends Fragment {
         if (isAdded()) {
             Log.i(TAG, "setupAdapter");
             mRecyclerView.setAdapter(new NewsAdapter(mNewsItems));
-
         }
     }
 
     public void addNewsItems(List<NewsItem> items) {
         Log.i(TAG, "addNewsItems");
         if (items.size() != 0) {
+            saveLastDate(items.get(0).getPublishedAt());
             mNewsItems.addAll(0, items);
             NewsAdapter adapter = (NewsAdapter) mRecyclerView.getAdapter();
             //adapter.notifyDataSetChanged();
@@ -192,8 +199,8 @@ public class NewsRecyclerFragment extends Fragment {
             mTransitionDrawable.startTransition(300);
         }
 
-        public void setImageBackground() {
-            mItemImage.setImageDrawable(mImageBackground);
+        public void clearImage() {
+            mItemImage.setImageDrawable(null);
         }
 
         @Override
@@ -228,7 +235,7 @@ public class NewsRecyclerFragment extends Fragment {
                 case R.layout.recycler_imaged_news_item:
                     break;
                 case R.layout.recycler_news_item:
-                    itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_imaged_news_item, parent, false);
+                    itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_news_item, parent, false);
                     break;
             }
 
@@ -242,7 +249,7 @@ public class NewsRecyclerFragment extends Fragment {
 
             String imageUrl = item.getUrlToImage();
             if (imageUrl != null) {
-                holder.setImageBackground();
+                holder.clearImage();
                 mImageDownloader.queueImage(holder, imageUrl);
             }
         }
@@ -251,7 +258,14 @@ public class NewsRecyclerFragment extends Fragment {
         public int getItemCount() {
             return mNewsItems.size();
         }
+    }
 
+    public void saveLastDate(Date date) {
+        QueryPreferences.setLastDateQuery(getContext(), date);
+    }
+
+    public Date getLastDate() {
+        return QueryPreferences.getLastDateQuery(getContext());
     }
 
 }

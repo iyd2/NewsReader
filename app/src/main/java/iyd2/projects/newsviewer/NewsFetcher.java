@@ -72,13 +72,17 @@ public class NewsFetcher {
                 NewsItem item = new NewsItem(jsonItem.getString("title"),
                         jsonItem.getString("description"));
 
+                Log.d(TAG, item.getTitle());
                 //if (jsonItem.has("publishedAt")) {
                 item.setPublishedAt(dateFormat.parse(jsonItem.getString("publishedAt")));
                 //}
 
                 if (jsonItem.has("urlToImage")) {
+                    Log.d(TAG, "hasURL");
                     String urlToImage = jsonItem.getString("urlToImage");
                     item.setUrlToImage(isUrlValid(urlToImage) ? urlToImage : null);
+                    Log.d(TAG, "url is valid:" + String.valueOf(isUrlValid(urlToImage)));
+                    Log.d(TAG, "url to image:" + urlToImage);
                 }
 
                 item.setUrl(jsonItem.getString("url"));
@@ -97,7 +101,7 @@ public class NewsFetcher {
 
         try {
             JSONArray jsonArticles = jsonObject.optJSONArray("articles");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
 
             for (int i = 0; i < jsonArticles.length(); i++) {
                 JSONObject jsonItem = jsonArticles.optJSONObject(i);
@@ -163,7 +167,7 @@ public class NewsFetcher {
     private boolean isUrlValid(String urlSpec) {
 
         try {
-            URL url = new URL(urlSpec);
+            new URL(urlSpec);
             return true;
         } catch (MalformedURLException e) {
             return false;
