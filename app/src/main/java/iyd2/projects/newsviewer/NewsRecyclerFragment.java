@@ -141,6 +141,10 @@ public class NewsRecyclerFragment extends Fragment {
                 addNewsItems(items);
             }
 
+            if (items.size() != 0) {
+                saveLastDate(items.get(0).getPublishedAt());
+            }
+
         }
     }
 
@@ -155,7 +159,6 @@ public class NewsRecyclerFragment extends Fragment {
     public void addNewsItems(List<NewsItem> items) {
         Log.i(TAG, "addNewsItems");
         if (items.size() != 0) {
-            saveLastDate(items.get(0).getPublishedAt());
             mNewsItems.addAll(0, items);
             NewsAdapter adapter = (NewsAdapter) mRecyclerView.getAdapter();
             //adapter.notifyDataSetChanged();
