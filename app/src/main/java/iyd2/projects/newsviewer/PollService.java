@@ -2,12 +2,17 @@ package iyd2.projects.newsviewer;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import java.util.Date;
@@ -66,6 +71,25 @@ public class PollService extends IntentService {
         }
 
         Log.i(TAG, "Got new items");
+
+        Resources resources = getResources();
+        Intent i = NewsRecyclerActivity.newIntent(this);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
+
+        Notification notification = new NotificationCompat.Builder(this)
+                .setTicker(resources.getString(R.string.notification_ticker))
+                .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                .setContentTitle(resources.getString(R.string.notification_ticker))
+                .setContentText(resources.getString(R.string.notification_ticker))
+                .setContentIntent(pi)
+                .setAutoCancel(true)
+                .build();
+
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+        nm.notify(0, notification);
+
+
+        QueryPreferences.setLastDateQuery(this, items.get(0).getPublishedAt());
 
     }
 
