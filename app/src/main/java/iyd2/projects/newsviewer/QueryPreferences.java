@@ -11,6 +11,7 @@ import java.util.Date;
 public class QueryPreferences {
     private static final String TAG = "QueryPreferences";
     private static final String LAST_DATE_QUERY = "last_date";
+    private static final String IS_ALARM_ON = "is_alarm_on";
 
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
 
@@ -29,6 +30,18 @@ public class QueryPreferences {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putString(LAST_DATE_QUERY, dateFormat.format(value))
+                .apply();
+    }
+
+    public static boolean isAlarmOn(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(IS_ALARM_ON, false);
+    }
+
+    public static void setIsAlarmOn(Context context, boolean isAlarmOn) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(IS_ALARM_ON, isAlarmOn)
                 .apply();
     }
 }
