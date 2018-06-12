@@ -34,22 +34,20 @@ public class NewsFetcher {
         List<NewsItem> items = new LinkedList<>();
 
         try {
-            String urlSpec = Uri.parse(ENDPOINT_BASE + ENDPOINT_TOP)
+            String urlSpec = buildBaseUri(ENDPOINT_TOP)
                     .buildUpon()
                     .appendQueryParameter("country", "us")
-                    //.appendQueryParameter("sources", "rt,lenta")
-                    .appendQueryParameter("apiKey", API_KEY)
                     .build()
                     .toString();
 
             Log.i(TAG, urlSpec);
             JSONObject jsonResponse = new JSONObject(getUrlString(urlSpec));
 
-            if (lastDate == null) {
-                parseItems(items, jsonResponse);
-            } else {
-                parseRecentItems(items, jsonResponse, lastDate);
-            }
+            //if (lastDate == null) {
+                parseItems(items, jsonResponse, lastDate);
+           // } else {
+               // parseRecentItems(items, jsonResponse, lastDate);
+            //}
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -60,7 +58,7 @@ public class NewsFetcher {
         return items;
     }
 
-    public void parseItems(List<NewsItem> items, JSONObject jsonObject) {
+    public void parseItems(List<NewsItem> items, JSONObject jsonObject, Date lastDate) {
 
         try {
             JSONArray jsonArticles = jsonObject.getJSONArray("articles");
@@ -74,6 +72,11 @@ public class NewsFetcher {
 
                 Log.d(TAG, item.getTitle());
                 Date publishedAt = dateFormat.parse(jsonItem.getString("publishedAt"));
+
+                if (lastDate != null && publishedAt.compareTo(lastDate) <= 0) {
+                    break;
+                }
+
                 item.setPublishedAt(publishedAt);
                 //}
 
@@ -174,6 +177,10 @@ public class NewsFetcher {
         }
     }
 
-
-
+    public Uri buildBaseUri(String endpoint) {
+        return Uri.parse(ENDPOINT_BASE + endpoint)
+                .buildUpon()
+                .appendQueryParameter("apiKey", API_KEY)
+                .build();
+    }
 }
