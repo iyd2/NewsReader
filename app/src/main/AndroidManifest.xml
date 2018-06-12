@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NewsRecyclerActivity"
+        <activity android:name=".MainNewsRecyclerActivity"
             android:taskAffinity=""
             android:excludeFromRecents="true"
             android:launchMode="singleTop">
@@ -29,7 +29,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewsItemActivity"
-            android:parentActivityName=".NewsRecyclerActivity">
+            android:parentActivityName=".MainNewsRecyclerActivity">
+        </activity>
+
+        <activity android:name=".NewsSearchRecyclerActivity"
+            android:parentActivityName=".MainNewsRecyclerActivity">
         </activity>
 
         <service android:name=".PollService"/>

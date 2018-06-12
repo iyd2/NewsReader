@@ -22,7 +22,6 @@ import java.util.List;
 public class NewsFetcher {
 
     private static final String TAG = "NewsFetcher";
-
     private static final String API_KEY = "8e86a3242262432e88bd7a723e457b8c";
     private static final String ENDPOINT_BASE = "https://newsapi.org/v2/";
     private static final String ENDPOINT_TOP = "top-headlines";
@@ -36,19 +35,40 @@ public class NewsFetcher {
         try {
             String urlSpec = buildBaseUri(ENDPOINT_TOP)
                     .buildUpon()
-                    .appendQueryParameter("country", "us")
+                    .appendQueryParameter("sources", "rt,lenta")
                     .build()
                     .toString();
 
             Log.i(TAG, urlSpec);
             JSONObject jsonResponse = new JSONObject(getUrlString(urlSpec));
 
-            //if (lastDate == null) {
-                parseItems(items, jsonResponse, lastDate);
-           // } else {
-               // parseRecentItems(items, jsonResponse, lastDate);
-            //}
+            parseItems(items, jsonResponse, lastDate);
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return items;
+    }
+
+    public List<NewsItem> searchNewsItems(String query) {
+        List<NewsItem> items = new LinkedList<>();
+
+        try {
+            String urlSpec = buildBaseUri(ENDPOINT_EVERYTHING)
+                    .buildUpon()
+                    .appendQueryParameter("q", query)
+                    .appendQueryParameter("sortBy", "publishedAt")
+                    .appendQueryParameter("language", "ru")
+                    .appendQueryParameter("sources", "rt,lenta")
+                    .build()
+                    .toString();
+
+            JSONObject jsonResponse = new JSONObject(getUrlString(urlSpec));
+
+            parseItems(items, jsonResponse, null);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -62,7 +82,7 @@ public class NewsFetcher {
 
         try {
             JSONArray jsonArticles = jsonObject.getJSONArray("articles");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
             for (int i = 0; i < jsonArticles.length(); i++) {
                 JSONObject jsonItem =  jsonArticles.getJSONObject(i);
@@ -99,44 +119,6 @@ public class NewsFetcher {
             Log.e(TAG, "Failed to parse Date", pe);
         }
     }
-
-    public void parseRecentItems(List<NewsItem> items, JSONObject jsonObject, Date lastDate) {
-
-        try {
-            JSONArray jsonArticles = jsonObject.optJSONArray("articles");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
-
-            for (int i = 0; i < jsonArticles.length(); i++) {
-                JSONObject jsonItem = jsonArticles.optJSONObject(i);
-
-                Date publishedAt = dateFormat.parse(jsonItem.getString("publishedAt"));
-
-                if (publishedAt.compareTo(lastDate) <= 0) {
-                    break;
-                }
-
-                NewsItem item = new NewsItem(jsonItem.getString("title"),
-                        jsonItem.getString("description"));
-
-                if (jsonItem.has("urlToImage")) {
-                    String urlToImage = jsonItem.getString("urlToImage");
-                    item.setUrlToImage(isUrlValid(urlToImage) ? urlToImage : null);
-                }
-
-                item.setUrl(jsonItem.getString("url"));
-
-                item.setPublishedAt(publishedAt);
-
-                items.add(item);
-
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     public String getUrlString (String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));

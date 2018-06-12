@@ -91,7 +91,7 @@ public class PollService extends IntentService {
         Log.i(TAG, "Got new items");
 
         Resources resources = getResources();
-        Intent i = NewsRecyclerActivity.newIntent(this);
+        Intent i = MainNewsRecyclerActivity.newIntent(this);
 
         PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
