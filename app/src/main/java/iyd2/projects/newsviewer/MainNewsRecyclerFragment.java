@@ -16,6 +16,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,14 +32,14 @@ import java.util.List;
 
 import static iyd2.projects.newsviewer.BitmapUtil.getImageSize;
 
-public class NewsRecyclerFragment extends VisibleFragment {
+public class NewsRecyclerFragment extends RecyclerFragment {
 
     private static final String TAG = "NewsRecyclerFragment";
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private RecyclerView mRecyclerView;
-    private ImageDownloader<NewsHolder> mImageDownloader;
-    private List<NewsItem> mNewsItems = new LinkedList<>();
+ //   private RecyclerView mRecyclerView;
+  //  private ImageDownloader<NewsHolder> mImageDownloader;
+  //  private List<NewsItem> mNewsItems = new LinkedList<>();
 
     public static Fragment newInstance() {
         return new NewsRecyclerFragment();
@@ -49,12 +52,14 @@ public class NewsRecyclerFragment extends VisibleFragment {
         Log.i(TAG, "onCreate");
 
         setRetainInstance(true);
+        // Получение обратных вызовов меню.
+        setHasOptionsMenu(true);
 
         new FetchNewsItems(null).execute();
 
         PollService.setServiceAlarm(getActivity(), true);
 
-        Handler responseHandler = new Handler();
+        /*Handler responseHandler = new Handler();
 
         mImageDownloader = new ImageDownloader<>(getImageSize(getActivity()), responseHandler);
         mImageDownloader.setImageDownloadListener(new ImageDownloader.ImageDownloadListener<NewsHolder>() {
@@ -65,7 +70,7 @@ public class NewsRecyclerFragment extends VisibleFragment {
             }
         });
         mImageDownloader.start();
-        mImageDownloader.getLooper();
+        mImageDownloader.getLooper();*/
 
     }
 
@@ -75,7 +80,8 @@ public class NewsRecyclerFragment extends VisibleFragment {
 
         Log.i(TAG, "onCreateView");
 
-        View v = inflater.inflate(R.layout.news_recycler, container, false);
+        //View v = inflater.inflate(R.layout.news_recycler, container, false);
+        View v = super.onCreateView(inflater, container, savedInstanceState);
 
         mSwipeRefreshLayout = v.findViewById(R.id.recycler_container);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -86,7 +92,7 @@ public class NewsRecyclerFragment extends VisibleFragment {
 
             }
         });
-        mRecyclerView = v.findViewById(R.id.recycler_view);
+        /*mRecyclerView = v.findViewById(R.id.recycler_view);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -95,11 +101,12 @@ public class NewsRecyclerFragment extends VisibleFragment {
         mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        setupAdapter();
+        setupAdapter();*/
         return v;
     }
 
-    @Override
+
+    /*@Override
     public void onDestroyView() {
         super.onDestroyView();
 
@@ -115,7 +122,7 @@ public class NewsRecyclerFragment extends VisibleFragment {
         Log.i(TAG, "onDestroy");
 
         mImageDownloader.quit();
-    }
+    }*/
 
     private class FetchNewsItems extends AsyncTask<Void, Void, List<NewsItem>> {
 
@@ -148,13 +155,13 @@ public class NewsRecyclerFragment extends VisibleFragment {
         }
     }
 
-    // Вызывается при создании нового объекта RecyclerView.
+    /* Вызывается при создании нового объекта RecyclerView.
     public void setupAdapter() {
         if (isAdded()) {
             Log.i(TAG, "setupAdapter");
             mRecyclerView.setAdapter(new NewsAdapter(mNewsItems));
         }
-    }
+    }*/
 
     public void addNewsItems(List<NewsItem> items) {
         Log.i(TAG, "addNewsItems");
@@ -169,7 +176,7 @@ public class NewsRecyclerFragment extends VisibleFragment {
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
-    private class NewsHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    /*private class NewsHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private TextView mItemTitle;
         private ImageView mItemImage;
@@ -261,6 +268,23 @@ public class NewsRecyclerFragment extends VisibleFragment {
         @Override
         public int getItemCount() {
             return mNewsItems.size();
+        }
+    }*/
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.news_recycler_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search_item:
+                getActivity().startActivity(NewsSearchActivity.newIntent(getActivity()));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">NewsViewer</string>
+    <string name="app_name">NewsReader</string>
     <string name="notification_ticker">Опобликованы новые новости</string>
+    <string name="search_menu_item">Поиск</string>
 </resources>
