@@ -23,7 +23,7 @@ public class NewsImageView extends android.support.v7.widget.AppCompatImageView 
 
         Resources resources = getContext().getResources();
         int width = (int) (resources.getDisplayMetrics().widthPixels - resources.getDimension(R.dimen.sidePadding) * 2);
-        int height = (int) resources.getDimension(R.dimen.bitmapHeight);
+        int height = resources.getDisplayMetrics().heightPixels / 3;
 
         setMeasuredDimension(width, height);
     }
