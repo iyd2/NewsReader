@@ -1,7 +1,5 @@
 package iyd2.projects.newsviewer;
 
-
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -31,7 +29,7 @@ import java.util.List;
 
 import static iyd2.projects.newsviewer.BitmapUtil.getImageSize;
 
-public class NewsRecyclerFragment extends Fragment {
+public class NewsRecyclerFragment extends VisibleFragment {
 
     private static final String TAG = "NewsRecyclerFragment";
 
@@ -83,7 +81,9 @@ public class NewsRecyclerFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new FetchNewsItems(getLastDate()).execute();
+                new FetchNewsItems(mNewsItems.get(0).getPublishedAt()).execute();
+                Log.d(TAG, "last date = " + mNewsItems.get(0).getPublishedAt().toString());
+
             }
         });
         mRecyclerView = v.findViewById(R.id.recycler_view);
@@ -159,6 +159,7 @@ public class NewsRecyclerFragment extends Fragment {
     public void addNewsItems(List<NewsItem> items) {
         Log.i(TAG, "addNewsItems");
         if (items.size() != 0) {
+            Log.d(TAG, "have new items");
             mNewsItems.addAll(0, items);
             NewsAdapter adapter = (NewsAdapter) mRecyclerView.getAdapter();
             //adapter.notifyDataSetChanged();

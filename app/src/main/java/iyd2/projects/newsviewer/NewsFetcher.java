@@ -36,8 +36,8 @@ public class NewsFetcher {
         try {
             String urlSpec = Uri.parse(ENDPOINT_BASE + ENDPOINT_TOP)
                     .buildUpon()
-                    .appendQueryParameter("country", "ru")
-                    .appendQueryParameter("source", "ria.ru")
+                    .appendQueryParameter("country", "us")
+                    //.appendQueryParameter("sources", "rt,lenta")
                     .appendQueryParameter("apiKey", API_KEY)
                     .build()
                     .toString();
@@ -64,7 +64,7 @@ public class NewsFetcher {
 
         try {
             JSONArray jsonArticles = jsonObject.getJSONArray("articles");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
 
             for (int i = 0; i < jsonArticles.length(); i++) {
                 JSONObject jsonItem =  jsonArticles.getJSONObject(i);
@@ -73,8 +73,8 @@ public class NewsFetcher {
                         jsonItem.getString("description"));
 
                 Log.d(TAG, item.getTitle());
-                //if (jsonItem.has("publishedAt")) {
-                item.setPublishedAt(dateFormat.parse(jsonItem.getString("publishedAt")));
+                Date publishedAt = dateFormat.parse(jsonItem.getString("publishedAt"));
+                item.setPublishedAt(publishedAt);
                 //}
 
                 if (jsonItem.has("urlToImage")) {

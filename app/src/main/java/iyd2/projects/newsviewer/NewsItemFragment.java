@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class NewsItemFragment extends Fragment {
+public class NewsItemFragment extends VisibleFragment {
 
     private static final String ARG_URL = "news_item_url";
     private String mUrl;
