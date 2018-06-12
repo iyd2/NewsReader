@@ -45,9 +45,9 @@ public class BitmapUtil {
 
 
         options.inJustDecodeBounds = false;
-        Bitmap temp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
 
-        float scaleCoeff;
+        /*float scaleCoeff;
         if (reqWidth >= options.outWidth  && reqHeight >= options.outHeight) {
             scaleCoeff = Math.max(reqWidth / (float) options.outWidth, reqHeight / (float) options.outHeight);
         } else if (reqWidth <= options.outWidth  && reqHeight <= options.outHeight) {
@@ -61,18 +61,8 @@ public class BitmapUtil {
         Matrix matrix = new Matrix();
         matrix.setScale(scaleCoeff, scaleCoeff);
 
-
-
-        //Bitmap bitmap1 = Bitmap.createBitmap(temp, 0, 0, options.outWidth, options.outHeight, matrix, true);
-        /*int cropedX = Math.abs(bitmap1.getWidth() - reqWidth) / 2 ;
-        int cropedY = Math.abs(bitmap1.getHeight() - reqHeight) / 2 ;
-        Bitmap bitmap = Bitmap.createBitmap(bitmap1
-                , cropedX
-                , cropedY
-                , reqWidth
-                , reqHeight);*/
-
-        return Bitmap.createBitmap(temp, 0, 0, options.outWidth, options.outHeight, matrix, true);
+        return Bitmap.createBitmap(temp, 0, 0, options.outWidth, options.outHeight, matrix, true);*/
+        return bitmap;
 
     }
 
