@@ -22,10 +22,22 @@ import java.util.List;
 public class MainNewsRecyclerFragment extends NewsRecyclerFragment {
 
     private static final String TAG = "MainNewsRecycleFragment";
+    private static final String ARG_CATEGORY = "category";
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private String mCategory;
 
-    public static Fragment newInstance() {
-        return new MainNewsRecyclerFragment();
+    public static Fragment newInstance(String category) {
+        Fragment fragment = new MainNewsRecyclerFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_CATEGORY, category);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
     }
 
     @Override
@@ -35,8 +47,9 @@ public class MainNewsRecyclerFragment extends NewsRecyclerFragment {
 
         // Получение обратных вызовов меню.
         setHasOptionsMenu(true);
+        mCategory = getArguments().getString(ARG_CATEGORY);
 
-        new FetchNewsItems(null).execute();
+        new FetchNewsItems(mCategory, null).execute();
 
         PollService.setServiceAlarm(getActivity(), true);
     }
@@ -60,7 +73,7 @@ public class MainNewsRecyclerFragment extends NewsRecyclerFragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new FetchNewsItems(mNewsItems.get(0).getPublishedAt()).execute();
+                new FetchNewsItems(mCategory, mNewsItems.get(0).getPublishedAt()).execute();
                 Log.d(TAG, "last date = " + mNewsItems.get(0).getPublishedAt().toString());
 
             }
@@ -71,14 +84,16 @@ public class MainNewsRecyclerFragment extends NewsRecyclerFragment {
     private class FetchNewsItems extends AsyncTask<Void, Void, List<NewsItem>> {
 
         private Date lastDate;
+        private String category;
 
-        public FetchNewsItems(Date lastDate) {
+        public FetchNewsItems(String category, Date lastDate) {
             this.lastDate = lastDate;
+            this.category = category;
         }
 
         @Override
         protected List<NewsItem> doInBackground(Void... voids) {
-            return new NewsFetcher().fetchNewsItems(lastDate);
+            return new NewsFetcher().fetchNewsItems(category, lastDate);
         }
 
         // Выполняется в главном потоке.

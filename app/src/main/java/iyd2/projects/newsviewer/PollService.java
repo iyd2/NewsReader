@@ -82,7 +82,7 @@ public class PollService extends IntentService {
 
         Date lastDate = QueryPreferences.getLastDateQuery(this);
 
-        List<NewsItem> items = new NewsFetcher().fetchNewsItems(lastDate);
+        List<NewsItem> items = new NewsFetcher().fetchNewsItems("general", lastDate);
 
         if (items.size() == 0) {
             return;

@@ -195,4 +195,5 @@ public abstract class NewsRecyclerFragment extends VisibleFragment {
         }
     }
 
+
 }

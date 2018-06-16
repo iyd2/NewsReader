@@ -29,13 +29,15 @@ public class NewsFetcher {
     private static final String ENDPOINT_SOURCES = "sources";
 
 
-    public List<NewsItem> fetchNewsItems(Date lastDate) {
+    public List<NewsItem> fetchNewsItems(String category, Date lastDate) {
         List<NewsItem> items = new LinkedList<>();
 
         try {
             String urlSpec = buildBaseUri(ENDPOINT_TOP)
                     .buildUpon()
-                    .appendQueryParameter("sources", "rt,lenta")
+                    //.appendQueryParameter("sources", "rt,lenta")
+                    .appendQueryParameter("country", "ru")
+                    .appendQueryParameter("category", category)
                     .build()
                     .toString();
 
