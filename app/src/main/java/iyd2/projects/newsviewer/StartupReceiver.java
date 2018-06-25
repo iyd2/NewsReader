@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import iyd2.projects.newsviewer.utils.QueryPreferences;
+
 public class StartupReceiver extends BroadcastReceiver {
 
     //Выполняется в гланом потоке.

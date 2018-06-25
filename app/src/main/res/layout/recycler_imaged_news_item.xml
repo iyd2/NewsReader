@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <iyd2.projects.newsviewer.NewsImageView
+        <iyd2.projects.newsviewer.views.NewsImageView
             android:id="@+id/news_item_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,12 +25,19 @@
             android:id="@+id/news_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/textViewMargin"
+            android:gravity="left"
+            style="@style/TextView.Imaged"/>
 
         <TextView
             android:id="@+id/news_item_published_at"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/textViewMargin"
+            android:layout_marginBottom="@dimen/textViewMargin"
+            android:gravity="left"
+            style="TextView.Date"/>
 
     </LinearLayout>
 

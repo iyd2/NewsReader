@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import iyd2.projects.newsviewer.utils.QueryPreferences;
+
 public class PollService extends IntentService {
 
     private static final String TAG = "PollService";
@@ -29,7 +31,7 @@ public class PollService extends IntentService {
     public static final String REQUEST_CODE = "REQUEST_CODE";
     public static final String NOTIFICATION = "NOTIFICATION";
 
-    private static final long POLL_INTERVAL_MS = TimeUnit.HOURS.toMillis(1);
+    private static final long POLL_INTERVAL_MS = TimeUnit.HOURS.toMillis(3);
     private NotificationChannel mChannel;
 
     public PollService() {

@@ -18,6 +18,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+
+import iyd2.projects.newsviewer.utils.DateUtil;
 
 public class NewsFetcher {
 
@@ -63,8 +66,9 @@ public class NewsFetcher {
                     .buildUpon()
                     .appendQueryParameter("q", query)
                     .appendQueryParameter("sortBy", "publishedAt")
+                    .appendQueryParameter("country", "ru")
                     .appendQueryParameter("language", "ru")
-                    .appendQueryParameter("sources", "rt,lenta")
+                    //.appendQueryParameter("sources", "rt,lenta")
                     .build()
                     .toString();
 
@@ -84,7 +88,7 @@ public class NewsFetcher {
 
         try {
             JSONArray jsonArticles = jsonObject.getJSONArray("articles");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            SimpleDateFormat dateFormat = DateUtil.getMainSimpleDateFormat();
 
             for (int i = 0; i < jsonArticles.length(); i++) {
                 JSONObject jsonItem =  jsonArticles.getJSONObject(i);

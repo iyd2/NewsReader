@@ -1,4 +1,4 @@
-package iyd2.projects.newsviewer;
+package iyd2.projects.newsviewer.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +12,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+
+import iyd2.projects.newsviewer.R;
 
 public class BitmapUtil {
 
@@ -47,21 +49,6 @@ public class BitmapUtil {
         options.inJustDecodeBounds = false;
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
 
-        /*float scaleCoeff;
-        if (reqWidth >= options.outWidth  && reqHeight >= options.outHeight) {
-            scaleCoeff = Math.max(reqWidth / (float) options.outWidth, reqHeight / (float) options.outHeight);
-        } else if (reqWidth <= options.outWidth  && reqHeight <= options.outHeight) {
-            scaleCoeff = Math.max(reqWidth / (float) options.outWidth, reqHeight / (float) options.outHeight);
-        } else if (reqWidth < options.outWidth) {
-            scaleCoeff = reqHeight / (float) options.outHeight;
-        } else {
-            scaleCoeff = reqWidth / (float) options.outWidth;
-        }
-
-        Matrix matrix = new Matrix();
-        matrix.setScale(scaleCoeff, scaleCoeff);
-
-        return Bitmap.createBitmap(temp, 0, 0, options.outWidth, options.outHeight, matrix, true);*/
         return bitmap;
 
     }

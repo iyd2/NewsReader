@@ -2,4 +2,5 @@
 <resources>
     <dimen name="bitmapHeight">200dp</dimen>
     <dimen name="sidePadding">16dp</dimen>
+    <dimen name="textViewMargin">8dp</dimen>
 </resources>

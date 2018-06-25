@@ -9,6 +9,8 @@ import android.os.Message;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import iyd2.projects.newsviewer.utils.BitmapUtil;
+
 public class ImageDownloader<T> extends HandlerThread {
 
     private static final String TAG = "ImageDownloader";

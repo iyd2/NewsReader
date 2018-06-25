@@ -17,10 +17,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
-import static iyd2.projects.newsviewer.BitmapUtil.getImageSize;
+import iyd2.projects.newsviewer.utils.DateUtil;
+
+import static iyd2.projects.newsviewer.utils.BitmapUtil.getImageSize;
 
 public abstract class NewsRecyclerFragment extends VisibleFragment {
 
@@ -102,7 +108,7 @@ public abstract class NewsRecyclerFragment extends VisibleFragment {
     protected class NewsHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private TextView mItemTitle;
-        private ImageView mItemImage;
+        private ImageView mItemImageView;
         private TextView mIemPublishedAt;
         private NewsItem mNewsItem;
         private Drawable mImageBackground;
@@ -114,7 +120,7 @@ public abstract class NewsRecyclerFragment extends VisibleFragment {
             itemView.setOnClickListener(this);
 
             mItemTitle = itemView.findViewById(R.id.news_item_title);
-            mItemImage = itemView.findViewById(R.id.news_item_image);
+            mItemImageView = itemView.findViewById(R.id.news_item_image);
             mIemPublishedAt = itemView.findViewById(R.id.news_item_published_at);
             mImageBackground = getResources().getDrawable(R.drawable.image_background);
         }
@@ -122,7 +128,7 @@ public abstract class NewsRecyclerFragment extends VisibleFragment {
         public void onBindNewsItem(NewsItem item) {
             mNewsItem = item;
             mItemTitle.setText(mNewsItem.getTitle());
-            String publishedAt = mNewsItem.getPublishedAt().toString();
+            String publishedAt = DateUtil.getTimeAgo(mNewsItem.getPublishedAt().getTime(), getContext());
             if (publishedAt != null) {
                 mIemPublishedAt.setText(publishedAt);
             }
@@ -130,12 +136,12 @@ public abstract class NewsRecyclerFragment extends VisibleFragment {
 
         public void onBindViewDrawable(Drawable drawable) {
             TransitionDrawable mTransitionDrawable = new TransitionDrawable(new Drawable[]{mImageBackground, drawable});
-            mItemImage.setImageDrawable(mTransitionDrawable);
+            mItemImageView.setImageDrawable(mTransitionDrawable);
             mTransitionDrawable.startTransition(300);
         }
 
         public void clearImage() {
-            mItemImage.setImageDrawable(null);
+            mItemImageView.setImageDrawable(null);
         }
 
         @Override
@@ -194,6 +200,5 @@ public abstract class NewsRecyclerFragment extends VisibleFragment {
             return mNewsItems.size();
         }
     }
-
 
 }

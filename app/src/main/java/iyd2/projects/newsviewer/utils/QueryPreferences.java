@@ -1,4 +1,4 @@
-package iyd2.projects.newsviewer;
+package iyd2.projects.newsviewer.utils;
 
 import android.content.Context;
 import android.preference.PreferenceManager;

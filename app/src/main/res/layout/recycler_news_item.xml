@@ -17,12 +17,18 @@
             android:id="@+id/news_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:gravity="center"
+            style="@style/TextView.Main"/>
 
         <TextView
             android:id="@+id/news_item_published_at"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:layout_marginLeft="@dimen/textViewMargin"
+            android:layout_marginBottom="@dimen/textViewMargin"
+            style="TextView.Date"/>
 
     </LinearLayout>
 

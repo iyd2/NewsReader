@@ -8,4 +8,21 @@
     <string name="health">Здоровье</string>
     <string name="science">Наука и технологии</string>
     <string name="sports">Спорт</string>
+
+
+
+    <string name="just_now">только что</string>
+    <string name="minute_ago">минуту назад</string>
+    <string name="minutes_ago_till_5">минуты назад</string>
+    <string name="minutes_ago_since_5">минут назад</string>
+    <string name="hour_ago">час назад</string>
+    <string name="hours_ago_till_5">часа назад</string>
+    <string name="hours_ago_since_5">часов назад</string>
+    <string name="yesterday">вчера</string>
+    <string name="days_before_yst">позавчера</string>
+    <string name="day_ago">день назад</string>
+    <string name="days_ago_till_5">дня назад</string>
+    <string name="days_ago_since_5">дней назад</string>
+
+
 </resources>

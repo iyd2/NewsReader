@@ -8,4 +8,19 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="TextView.Imaged" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/news_title_font</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextView.Main" parent="@style/TextView.Imaged">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="TextView.Date" parent="android:Widget.TextView">
+        <item name="android:textSize">8sp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
 </resources>
